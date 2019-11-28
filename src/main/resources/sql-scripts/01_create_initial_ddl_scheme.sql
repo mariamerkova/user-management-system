@@ -1,0 +1,38 @@
+CREATE TABLE user (
+id_user  BIGINT(19) PRIMARY KEY AUTO_INCREMENT,
+username VARCHAR(30) NOT NULL,
+password VARCHAR(30) NOT NULL,
+first_name VARCHAR(20),
+last_name VARCHAR(20),
+age INTEGER(10),
+birth_date DATE,
+created_on DATETIME NOT NULL,
+updated_on DATETIME NOT NULL
+);
+
+
+CREATE TABLE privilege (
+id_privilege BIGINT(19) PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE role (
+id_role BIGINT(19) PRIMARY KEY AUTO_INCREMENT,
+name VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE privilege_role (
+privilegeid_privilege BIGINT(19),
+roleid_role BIGINT(19),
+CONSTRAINT PRIVILEGE_ROLE_FK_01 FOREIGN KEY(privilegeid_privilege)
+REFERENCES PRIVILEGE(id_privilege),
+CONSTRAINT PRIVILEGE_ROLE_FK_02 FOREIGN KEY(roleid_role)
+REFERENCES ROLE(id_role));
+
+CREATE TABLE role_user (
+roleid_role BIGINT(19),
+userid_user BIGINT(19),
+CONSTRAINT ROLE_USER_FK_01 FOREIGN KEY(roleid_role)
+REFERENCES ROLE(id_role),
+CONSTRAINT ROLE_USER_FK_02 FOREIGN KEY(userid_user)
+REFERENCES USER(id_user));
