@@ -1,13 +1,11 @@
 package com.mariamerkova.usermanagement.api;
 
+import com.mariamerkova.usermanagement.model.CredentialsDTO;
 import com.mariamerkova.usermanagement.model.UserDTO;
 import com.mariamerkova.usermanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,7 +22,12 @@ public class UserApi {
    }
 
    @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> findSpecificUser(@PathVariable final Long userId) {
-        return ResponseEntity.ok(userService.findById(userId));
+    public ResponseEntity<UserDTO> findSpecificUser(@PathVariable final Long id) {
+        return ResponseEntity.ok(userService.findById(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<UserDTO>  save( @RequestBody final CredentialsDTO credentials) {
+        return ResponseEntity.ok(userService.save(credentials));
     }
 }

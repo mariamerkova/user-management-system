@@ -16,4 +16,5 @@ public interface UserRepository {
 
     void updateUser(final User user);
 
+    User findUserByUsername(final String username);
 }

@@ -52,6 +52,26 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public User findUserByUsername(final String username) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
+        Root<User> userRoot = criteriaQuery.from(User.class);
+        criteriaQuery.where(criteriaBuilder.equal(userRoot.get("username"), username));
+        TypedQuery<User> query = entityManager.createQuery(criteriaQuery);
+
+        User user = null;
+        try {
+            user = query.getSingleResult();
+        } catch (NoResultException e) {
+
+        }
+        return user;
+
+    }
+
+
+
+    @Override
     public void saveUser(final User user) {
         entityManager.persist(user);
     }
@@ -65,4 +85,6 @@ public class UserRepositoryImpl implements UserRepository {
     public void updateUser(final User user) {
         entityManager.merge(user);
     }
+
+
 }
