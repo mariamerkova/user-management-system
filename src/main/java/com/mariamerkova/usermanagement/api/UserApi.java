@@ -18,7 +18,7 @@ public class UserApi {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<List<UserDTO>> listAllUsers() {
         return ResponseEntity.ok(userService.findAll());
    }
