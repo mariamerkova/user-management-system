@@ -1,5 +1,7 @@
 package com.mariamerkova.usermanagement.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 
 public class UserDTO {
@@ -7,8 +9,11 @@ public class UserDTO {
     private Long id;
     private String firstName;
     private String lastName;
-    private int age;
+    private Integer age;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate birthDate;
+    private String username;
 
     public UserDTO(){}
 
@@ -36,11 +41,11 @@ public class UserDTO {
         this.lastName = lastName;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 
@@ -50,5 +55,13 @@ public class UserDTO {
 
     public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

@@ -8,11 +8,15 @@ import com.mariamerkova.usermanagement.model.User;
 import com.mariamerkova.usermanagement.model.UserDTO;
 import com.mariamerkova.usermanagement.repository.UserRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +25,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    private static Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
 
 
@@ -72,6 +78,47 @@ public class UserServiceImpl implements UserService {
 
 
         return transformUserToUserDTO(user);
+    }
+
+    @Override
+    @Transactional
+    public UserDTO update(final UserDTO userDTO) {
+        if (StringUtils.isBlank(userDTO.getUsername())) {
+            throw  new RequiredArgumentException();
+        }
+
+        User user = userRepository.findUserByUsername(userDTO.getUsername());
+
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+
+        if (userDTO.getBirthDate() == null) {
+            user.setAge(null);
+        } else {
+            LocalDate today = LocalDate.now();
+            LocalDate birthday = userDTO.getBirthDate();
+
+            Period p = Period.between(birthday, today);
+            log.info("Years between this period are {}", p.getYears());
+            user.setAge(p.getYears());
+            user.setBirthDate(birthday);
+        }
+
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+
+        userRepository.updateUser(user);
+
+        return transformUserToUserDTO(user);
+    }
+
+    private User transformUserDTOToUser(final UserDTO userDTO) {
+        User user = new User();
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setBirthDate(userDTO.getBirthDate());
+        return user;
     }
 
 

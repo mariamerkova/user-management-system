@@ -27,7 +27,7 @@ public class User {
     private String lastName;
 
     @Column(name = "AGE")
-    private int age;
+    private Integer age;
 
     @Column(name = "BIRTH_DATE")
     private LocalDate birthDate;
@@ -92,11 +92,11 @@ public class User {
         this.lastName = lastName;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 

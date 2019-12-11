@@ -1,6 +1,7 @@
 package com.mariamerkova.usermanagement.api;
 
 import com.mariamerkova.usermanagement.model.CredentialsDTO;
+import com.mariamerkova.usermanagement.model.User;
 import com.mariamerkova.usermanagement.model.UserDTO;
 import com.mariamerkova.usermanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,5 +30,10 @@ public class UserApi {
     @PostMapping
     public ResponseEntity<UserDTO>  save( @RequestBody final CredentialsDTO credentials) {
         return ResponseEntity.ok(userService.save(credentials));
+    }
+
+    @PutMapping
+     public ResponseEntity<UserDTO> update(@RequestBody final UserDTO userDTO) {
+        return ResponseEntity.ok(userService.update(userDTO));
     }
 }
