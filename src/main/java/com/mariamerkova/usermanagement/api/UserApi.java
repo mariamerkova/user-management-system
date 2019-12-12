@@ -36,4 +36,9 @@ public class UserApi {
      public ResponseEntity<UserDTO> update(@RequestBody final UserDTO userDTO) {
         return ResponseEntity.ok(userService.update(userDTO));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> delete( @PathVariable final Long id) {
+        return ResponseEntity.ok(userService.delete(id));
+    }
 }

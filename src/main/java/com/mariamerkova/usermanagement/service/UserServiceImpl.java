@@ -2,6 +2,7 @@ package com.mariamerkova.usermanagement.service;
 
 import com.mariamerkova.usermanagement.exception.AuthenticationException;
 import com.mariamerkova.usermanagement.exception.RequiredArgumentException;
+import com.mariamerkova.usermanagement.exception.RequiredMinSizePasswordException;
 import com.mariamerkova.usermanagement.exception.UserNotFoundException;
 import com.mariamerkova.usermanagement.model.CredentialsDTO;
 import com.mariamerkova.usermanagement.model.User;
@@ -65,7 +66,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (credentials.getPassword().length() < 6) {
-            throw new RequiredArgumentException();
+            throw new RequiredMinSizePasswordException();
         }
 
         User user = new User();
@@ -112,6 +113,19 @@ public class UserServiceImpl implements UserService {
 
         return transformUserToUserDTO(user);
     }
+
+    @Override
+    @Transactional
+    public boolean delete(final Long id) {
+        User user = userRepository.findById(id);
+        if (user == null) {
+            throw  new UserNotFoundException();
+        } else {
+            userRepository.deleteUser(user);
+        }
+        return true;
+    }
+
 
     private User transformUserDTOToUser(final UserDTO userDTO) {
         User user = new User();

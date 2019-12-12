@@ -1,5 +1,6 @@
 package com.mariamerkova.usermanagement;
 
+import com.mariamerkova.usermanagement.exception.UserNotFoundException;
 import com.mariamerkova.usermanagement.model.CredentialsDTO;
 import com.mariamerkova.usermanagement.model.User;
 import com.mariamerkova.usermanagement.model.UserDTO;
@@ -102,6 +103,32 @@ class UserRepositoryIntegrationTest {
 		Assertions.assertThat(persistedUserDTO.getBirthDate()).isEqualTo(LocalDate.of(1991, Month.JULY.getValue(), 24));
 		Period expectedPeriod = Period.between(LocalDate.of(1991, Month.JULY.getValue(), 24), LocalDate.now());
 		Assertions.assertThat(persistedUserDTO.getAge()).isEqualTo(expectedPeriod.getYears());
+	}
+
+	@Test
+	@DisplayName("Test deletion")
+	@Transactional
+	@Rollback
+	void testDeleteOperationOfUser() {
+		CredentialsDTO credentialsDTO = new CredentialsDTO();
+		credentialsDTO.setUsername("baby");
+		credentialsDTO.setPassword("newBabyM");
+
+		UserDTO persistedUser = userService.save(credentialsDTO);
+
+		UserDTO persistedUserDTO = userService.findById(persistedUser.getId()); // Na tazi stupka zarejdash obekt ot bazata
+
+
+		userService.delete(persistedUserDTO.getId()); // tuk podavash samo id kum delete i toi si vurshi negovata rabota
+		// sled tazi stupka v bazata moje i da nqma nishto, no zaredeniqt obekt ot liniq 118 vse oshte ti si e zareden s nqkkavi danni, vkluchitelno i id
+		//Assertions.assertThat(persistedUserDTO.getId()).isEqualTo(null); // tuk proverqvash dali id-to na zaredeniqt ti obekt ot predi malko ne e stanal null veqe. Ami nqma kak da stane, nikoj ne go iztril
+		// pravilnoto tuk e da se probvash otnovo da zarediw obekt ot bazata s repozitory primerno i da vidiw dali shte ti vurne null
+		try {
+			UserDTO expectedDeletedUser = userService.findById(persistedUserDTO.getId());
+			Assertions.fail("Must throw exception.");
+		} catch (Exception e) {
+			Assertions.assertThat(e).isInstanceOf(UserNotFoundException.class);
+		}
 	}
 
 

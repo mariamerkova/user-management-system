@@ -16,4 +16,6 @@ public interface UserService {
     UserDTO save(final CredentialsDTO credentials);
 
     UserDTO update(final UserDTO userDTO);
+
+    boolean delete(final Long id);
 }
