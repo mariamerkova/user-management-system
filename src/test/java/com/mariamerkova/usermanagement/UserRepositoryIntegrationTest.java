@@ -1,11 +1,15 @@
 package com.mariamerkova.usermanagement;
 
+import com.mariamerkova.usermanagement.exception.AuthenticationException;
+import com.mariamerkova.usermanagement.exception.RequiredArgumentException;
+import com.mariamerkova.usermanagement.exception.RequiredMinSizePasswordException;
 import com.mariamerkova.usermanagement.exception.UserNotFoundException;
 import com.mariamerkova.usermanagement.model.CredentialsDTO;
 import com.mariamerkova.usermanagement.model.User;
 import com.mariamerkova.usermanagement.model.UserDTO;
 import com.mariamerkova.usermanagement.repository.UserRepository;
 import com.mariamerkova.usermanagement.service.UserService;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,10 +33,42 @@ class UserRepositoryIntegrationTest {
 	private UserService userService;
 
 	@Test
+	@DisplayName("Test fetching successfully user, when it exist in DB")
+	@Transactional
+	@Rollback
+	void testFindByIdCase1() {
+		User user = new User();
+		user.setUsername("Maria");
+		user.setLastName("Merkova");
+		user.setUsername("mariamerkova");
+		user.setPassword("somestrongpassword");
+		user.setCreatedOn(LocalDateTime.now());
+		user.setUpdatedOn(LocalDateTime.now());
+
+		userRepository.saveUser(user);
+
+		try {
+			UserDTO persistedUser = userService.findById(user.getIdUser());
+			Assertions.assertThat(persistedUser).isNotNull();
+		} catch (Exception e) {
+			Assertions.fail("Must no throw any exception here", e);
+		}
+
+	}
+
+	@Test
+	@DisplayName("Test fetching user, but throwing UserNotFoundException")
+	@Transactional
+	@Rollback
+	void testFindByIdCase2() {
+		Assertions.assertThatThrownBy(() -> userService.findById(Long.MAX_VALUE)).isInstanceOf(UserNotFoundException.class);
+	}
+
+	@Test
 	@DisplayName("Test creation of a new user")
 	@Transactional
 	@Rollback
-	void testCreationOfAUser() {
+	void testCreationOfAUserCase1() {
 		User user = createMockUser();
 		userRepository.saveUser(user);
 		User persistedUser = userRepository.findById(user.getIdUser());
@@ -42,10 +78,65 @@ class UserRepositoryIntegrationTest {
 	}
 
 	@Test
+	@DisplayName("Test creation of a new user, throwing RequiredMinSizePasswordException")
+	@Transactional
+	@Rollback
+	void testCreationOfAUserCase2() {
+		CredentialsDTO credentialsDTO = new CredentialsDTO();
+		credentialsDTO.setUsername("mimi");
+		credentialsDTO.setPassword("mimi");
+		Assertions.assertThatThrownBy(() -> userService.save(credentialsDTO)).isInstanceOf(RequiredMinSizePasswordException.class);
+	}
+
+	@Test
+	@DisplayName("Test creation of a new user, throwing AuthenticationException")
+	@Transactional
+	@Rollback
+	void testCreationOfAUserCase3() {
+		CredentialsDTO credentialsDTO = new CredentialsDTO();
+		credentialsDTO.setUsername("mimi");
+		credentialsDTO.setPassword("mimitoooo");
+
+		userService.save(credentialsDTO); // тук си сигурна че първият път като подадеш такива креденшъли няма да гръмне
+		Assertions.assertThatThrownBy(() -> userService.save(credentialsDTO)).isInstanceOf(AuthenticationException.class);
+	}
+
+	@Test
+	@DisplayName("Test creation of a new user, throwing RequiredArgumentException with password equal to null")
+	@Transactional
+	@Rollback
+	void testCreationOfAUserCase4() {
+		CredentialsDTO credentialsDTO = new CredentialsDTO();
+		credentialsDTO.setPassword("mmgmhggbgb");
+		Assertions.assertThatThrownBy(() -> userService.save(credentialsDTO)).isInstanceOf(RequiredArgumentException.class);
+	}
+
+	@Test
+	@DisplayName("Test creation of a new user, throwing RequiredArgumentException with username equal to null")
+	@Transactional
+	@Rollback
+	void testCreationOfAUserCase5() {
+		CredentialsDTO credentialsDTO = new CredentialsDTO();
+		credentialsDTO.setUsername("mmgmhggbgb");
+		Assertions.assertThatThrownBy(() -> userService.save(credentialsDTO)).isInstanceOf(RequiredArgumentException.class);
+	}
+
+	@Test
+	@DisplayName("Test creation of a new user, throwing RequiredArgumentException with username and password equal to null")
+	@Transactional
+	@Rollback
+	void testCreationOfAUserCase6() {
+		CredentialsDTO credentialsDTO = new CredentialsDTO();
+		Assertions.assertThatThrownBy(() -> userService.save(credentialsDTO)).isInstanceOf(RequiredArgumentException.class);
+	}
+
+
+
+	@Test
 	@DisplayName("Test modification of a new user")
 	@Transactional
 	@Rollback
-	void testModificationOfAUser() {
+	void testModificationOfAUserCase1() {
 		User user = createMockUser();
 		userRepository.saveUser(user);
 		User persistedUser = userRepository.findById(user.getIdUser());
@@ -57,10 +148,41 @@ class UserRepositoryIntegrationTest {
 	}
 
 	@Test
+	@DisplayName("Test modification of a new user, throwing RequiredArgumentException")
+	@Transactional
+	@Rollback
+	void testModificationOfAUserCase2() {
+		UserDTO userDTO = new UserDTO();
+		userDTO.setBirthDate(LocalDate.now());
+		userDTO.setFirstName("mimi");
+		userDTO.setLastName("merkova");
+		userDTO.setAge(29);
+		Assertions.assertThatThrownBy(() -> userService.update(userDTO)).isInstanceOf(RequiredArgumentException.class);
+	}
+
+	@Test
+	@DisplayName("Test modification of a new user, throwing UserNotFoundException")
+	@Transactional
+	@Rollback
+	void testModificationOfAUserCase3() {
+		CredentialsDTO credentialsDTO = new CredentialsDTO();
+		credentialsDTO.setUsername("gfgfvff");
+		credentialsDTO.setPassword("fdfdfdfsdf");
+
+		UserDTO userDTO = new UserDTO();
+		userDTO.setUsername(credentialsDTO.getUsername());
+
+
+		Assertions.assertThatThrownBy(() -> userService.update(userDTO)).isInstanceOf(UserNotFoundException.class);
+	}
+
+
+
+	@Test
 	@DisplayName("Test deletion of a new user")
 	@Transactional
 	@Rollback
-	void testDeletionOfAUser() {
+	void testDeletionOfAUserCase1() {
 		User user = createMockUser();
 		userRepository.saveUser(user);
 		User persistedUser = userRepository.findById(user.getIdUser());
@@ -70,6 +192,15 @@ class UserRepositoryIntegrationTest {
 		userRepository.deleteUser(persistedUser);
 		persistedUser = userRepository.findById(user.getIdUser());
 		Assertions.assertThat(persistedUser).isNull();
+	}
+
+	@Test
+	@DisplayName("Test deletion of a new user, throwing UserNotFoundException")
+	@Transactional
+	@Rollback
+	void testDeletionOfAUserCase2() {
+		User user = new User();
+		Assertions.assertThatThrownBy(()-> userService.delete(user.getIdUser())).isInstanceOf(UserNotFoundException.class);
 	}
 
 	@Test
