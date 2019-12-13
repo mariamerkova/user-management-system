@@ -36,5 +36,11 @@ public class ExceptionAdvice {
         return ex.getMessage();
     }
 
+    @ResponseBody
+    @ExceptionHandler(PrivilegeAlreadyExistException.class)
+    @ResponseStatus(HttpStatus.FOUND)
+    String privilegeAlreadyExistHandler(PrivilegeAlreadyExistException ex) {
+        return ex.getMessage();
+    }
 
 }

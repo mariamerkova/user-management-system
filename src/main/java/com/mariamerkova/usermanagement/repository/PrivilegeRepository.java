@@ -8,4 +8,8 @@ public interface PrivilegeRepository {
 
     List<Privilege> findAll();
 
+    void save(final Privilege privilege);
+
+    Privilege findPrivilegeByName(final String name);
+
 }

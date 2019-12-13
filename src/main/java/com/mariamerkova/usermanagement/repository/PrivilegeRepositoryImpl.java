@@ -4,6 +4,7 @@ import com.mariamerkova.usermanagement.model.Privilege;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -33,6 +34,28 @@ public class PrivilegeRepositoryImpl implements PrivilegeRepository {
         return query.getResultList();
     }
 
+    @Override
+    public void save(final Privilege privilege) {
+        entityManager.persist(privilege);
+    }
+
+    @Override
+    public Privilege findPrivilegeByName(final String name) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Privilege> criteriaQuery = criteriaBuilder.createQuery(Privilege.class);
+        Root<Privilege> privilegeRoot = criteriaQuery.from(Privilege.class);
+
+        criteriaQuery.where(criteriaBuilder.equal(privilegeRoot.get("name"), name));
+        TypedQuery<Privilege> query = entityManager.createQuery(criteriaQuery);
+
+        Privilege privilege = null;
+        try {
+            privilege = query.getSingleResult();
+        } catch (NoResultException e) {
+
+        }
+        return privilege;
+    }
 
 
 }

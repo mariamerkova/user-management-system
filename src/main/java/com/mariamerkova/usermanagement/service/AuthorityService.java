@@ -9,4 +9,6 @@ public interface AuthorityService {
 
     List<PrivilegeDTO> findAll();
 
+    PrivilegeDTO save(final PrivilegeDTO privilegeDTO);
+
 }

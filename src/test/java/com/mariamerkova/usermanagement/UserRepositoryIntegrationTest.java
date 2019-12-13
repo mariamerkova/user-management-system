@@ -85,6 +85,7 @@ class UserRepositoryIntegrationTest {
 		CredentialsDTO credentialsDTO = new CredentialsDTO();
 		credentialsDTO.setUsername("mimi");
 		credentialsDTO.setPassword("mimi");
+
 		Assertions.assertThatThrownBy(() -> userService.save(credentialsDTO)).isInstanceOf(RequiredMinSizePasswordException.class);
 	}
 

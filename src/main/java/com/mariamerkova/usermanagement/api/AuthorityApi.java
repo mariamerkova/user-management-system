@@ -5,6 +5,7 @@ import com.mariamerkova.usermanagement.service.AuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,5 +21,10 @@ public class AuthorityApi {
     @GetMapping("/privilege")
     public ResponseEntity<List<PrivilegeDTO>> findAllPrivileges() {
         return ResponseEntity.ok(authorityService.findAll());
+    }
+
+    @PostMapping("/privilege")
+    public ResponseEntity<PrivilegeDTO> savePrivilege(PrivilegeDTO privilegeDTO) {
+        return ResponseEntity.ok(authorityService.save(privilegeDTO));
     }
 }

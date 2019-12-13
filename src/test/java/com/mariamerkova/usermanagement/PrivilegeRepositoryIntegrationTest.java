@@ -1,5 +1,8 @@
 package com.mariamerkova.usermanagement;
 
+import com.mariamerkova.usermanagement.exception.PrivilegeAlreadyExistException;
+import com.mariamerkova.usermanagement.model.Privilege;
+import com.mariamerkova.usermanagement.model.PrivilegeDTO;
 import com.mariamerkova.usermanagement.repository.PrivilegeRepository;
 import com.mariamerkova.usermanagement.service.AuthorityService;
 import org.assertj.core.api.Assertions;
@@ -26,5 +29,32 @@ public class PrivilegeRepositoryIntegrationTest {
     @Rollback
     public void testFindAllPrivileges() {
         Assertions.assertThat(privilegeRepository.findAll().size()).isEqualTo(authorityService.findAll().size());
+    }
+
+    @Test
+    @DisplayName("Test creation of a new privilege")
+    @Transactional
+    @Rollback
+    void testCreationOfPrivilegeCase1() {
+        Privilege privilege = new Privilege();
+        privilege.setName("mimi");
+
+        privilegeRepository.save(privilege);
+        Assertions.assertThat(privilege).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test creation of a new privilege , throwing PrivilegeAlreadyExistException ")
+    @Transactional
+    @Rollback
+    void testCreationOfPrivilegeCase2() {
+        Privilege privilege = new Privilege();
+        privilege.setName("mimi");
+        privilegeRepository.save(privilege);
+        PrivilegeDTO privilegeDTO = new PrivilegeDTO();
+        privilegeDTO.setName("mimi");
+
+        Assertions.assertThatThrownBy(() -> authorityService.save(privilegeDTO)).isInstanceOf(PrivilegeAlreadyExistException.class);
+
     }
 }
