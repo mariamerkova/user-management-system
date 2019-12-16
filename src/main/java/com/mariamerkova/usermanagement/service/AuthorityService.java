@@ -13,4 +13,6 @@ public interface AuthorityService {
 
     PrivilegeDTO update(final PrivilegeDTO privilegeDTO);
 
+    boolean delete(final Long id);
+
 }

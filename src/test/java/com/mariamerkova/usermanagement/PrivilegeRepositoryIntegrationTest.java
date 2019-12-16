@@ -136,5 +136,31 @@ public class PrivilegeRepositoryIntegrationTest {
         Assertions.assertThatThrownBy(() -> authorityService.update(secondPersistedEntity)).isInstanceOf(PrivilegeAlreadyExistException.class);
     }
 
+    @Test
+    @DisplayName("Test deletion of privilege")
+    @Transactional
+    @Rollback
+    void testDeletionOfPrivilegeCase1() {
+        Privilege privilege = new Privilege();
+        privilege.setName("mimi");
+        privilegeRepository.save(privilege);
+        Privilege persistedPrivilege = privilegeRepository.findById(privilege.getId());
+        Assertions.assertThat(persistedPrivilege).isNotNull();
+
+        privilegeRepository.deletePrivilege(privilege);
+        persistedPrivilege = privilegeRepository.findById(privilege.getId());
+        Assertions.assertThat(persistedPrivilege).isNull();
+
+    }
+
+    @Test
+    @DisplayName("Test deletion of privilege, throwing PrivilegeNotFoundException")
+    @Transactional
+    @Rollback
+    void testDeletionOfPrivilegeCase2() {
+        Privilege privilege = new Privilege();
+        Assertions.assertThatThrownBy(()->  authorityService.delete(privilege.getId())).isInstanceOf(PrivilegeNotFoundExcepion.class);
+    }
+
 
 }

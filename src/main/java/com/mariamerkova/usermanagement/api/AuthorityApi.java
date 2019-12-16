@@ -26,7 +26,12 @@ public class AuthorityApi {
     }
 
     @PutMapping("/privilege")
-    public ResponseEntity<PrivilegeDTO> updatePrililege(PrivilegeDTO privilegeDTO) {
+    public ResponseEntity<PrivilegeDTO> updatePrivilege(PrivilegeDTO privilegeDTO) {
         return ResponseEntity.ok(authorityService.update(privilegeDTO));
+    }
+
+    @DeleteMapping("/privilege/{id}")
+    public ResponseEntity<Boolean> deletePrivilege(@PathVariable Long id) {
+        return ResponseEntity.ok(authorityService.delete(id));
     }
 }

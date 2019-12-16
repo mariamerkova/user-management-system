@@ -64,6 +64,8 @@ public class PrivilegeRepositoryImpl implements PrivilegeRepository {
         entityManager.persist(privilege);
     }
 
+
+
     @Override
     public Privilege findById(final Long id) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -80,6 +82,11 @@ public class PrivilegeRepositoryImpl implements PrivilegeRepository {
 
         }
         return privilege;
+    }
+
+    @Override
+    public void deletePrivilege(final Privilege privilege) {
+        entityManager.remove(privilege);
     }
 
 

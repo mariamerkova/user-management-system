@@ -16,4 +16,6 @@ public interface PrivilegeRepository {
 
     Privilege findById(final Long id);
 
+    void deletePrivilege(final Privilege privilege);
+
 }

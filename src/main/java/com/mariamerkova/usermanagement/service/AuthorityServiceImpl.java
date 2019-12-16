@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class AuthorityServiceImpl implements AuthorityService {
     }
 
     @Override
+    @Transactional
     public PrivilegeDTO save(final PrivilegeDTO privilegeDTO) {
         Privilege privilege = new Privilege();
         privilege.setName(privilegeDTO.getName());
@@ -52,6 +54,7 @@ public class AuthorityServiceImpl implements AuthorityService {
     }
 
     @Override
+    @Transactional
     public PrivilegeDTO update(final PrivilegeDTO privilegeDTO) {
         if (StringUtils.isBlank(privilegeDTO.getName())) {
             throw new RequiredArgumentException();
@@ -77,6 +80,17 @@ public class AuthorityServiceImpl implements AuthorityService {
         return transformPrivilegeToPrivilegeDTO(persistedPrivilegeWithSameName);
     }
 
+    @Override
+    @Transactional
+    public boolean delete(final Long id) {
+        Privilege privilege = privilegeRepository.findById(id);
+        if (privilege == null) {
+            throw new PrivilegeNotFoundExcepion();
+        } else {
+            privilegeRepository.deletePrivilege(privilege);
+        }
+        return true;
+    }
 
     private PrivilegeDTO transformPrivilegeToPrivilegeDTO(final Privilege privilege) {
         PrivilegeDTO privilegeDTO = new PrivilegeDTO();
