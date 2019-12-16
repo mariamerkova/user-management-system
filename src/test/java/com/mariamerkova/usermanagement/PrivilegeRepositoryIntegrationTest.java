@@ -1,6 +1,8 @@
 package com.mariamerkova.usermanagement;
 
 import com.mariamerkova.usermanagement.exception.PrivilegeAlreadyExistException;
+import com.mariamerkova.usermanagement.exception.PrivilegeNotFoundExcepion;
+import com.mariamerkova.usermanagement.exception.RequiredArgumentException;
 import com.mariamerkova.usermanagement.model.Privilege;
 import com.mariamerkova.usermanagement.model.PrivilegeDTO;
 import com.mariamerkova.usermanagement.repository.PrivilegeRepository;
@@ -55,6 +57,84 @@ public class PrivilegeRepositoryIntegrationTest {
         privilegeDTO.setName("mimi");
 
         Assertions.assertThatThrownBy(() -> authorityService.save(privilegeDTO)).isInstanceOf(PrivilegeAlreadyExistException.class);
-
     }
+
+    @Test
+    @DisplayName("Test modification of a new privilege")
+    @Transactional
+    @Rollback
+    void testModificationOfPrivilegerCase1() {
+        Privilege privilege = new Privilege();
+        privilege.setName("mimi");
+
+        privilegeRepository.save(privilege);
+        Privilege persistedPrivilege = privilegeRepository.findById(privilege.getId());
+        persistedPrivilege.setName("misho");
+        privilegeRepository.update(privilege);
+
+        persistedPrivilege = privilegeRepository.findById(privilege.getId());
+
+        Assertions.assertThat(persistedPrivilege.getName()).isEqualTo("misho");
+    }
+
+
+    @Test
+    @DisplayName("Test modification of a new privilege, throwing  RequiredArgumentException with name")
+    @Transactional
+    @Rollback
+    void testModificationOfPrivilegerCase2() {
+        PrivilegeDTO privilegeDTO = new PrivilegeDTO();
+        privilegeDTO.setId(1L);
+
+        Assertions.assertThatThrownBy(() -> authorityService.update(privilegeDTO)).isInstanceOf(RequiredArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("Test modification of a new privilege, throwing  RequiredArgumentException with id")
+    @Transactional
+    @Rollback
+    void testModificationOfPrivilegerCase3() {
+        PrivilegeDTO privilegeDTO = new PrivilegeDTO();
+        privilegeDTO.setName("mimi");
+
+        Assertions.assertThatThrownBy(() -> authorityService.update(privilegeDTO)).isInstanceOf(RequiredArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("Test modification of a new privilege, throwing PrivilegeNotFoundExcepion")
+    @Transactional
+    @Rollback
+    void testModificationOfPrivilegerCase4() {
+        Privilege privilege = new Privilege();
+        privilege.setId(1l);
+        privilege.setName("mimi");
+
+        PrivilegeDTO privilegeDTO = new PrivilegeDTO();
+        privilegeDTO.setId(privilege.getId());
+        privilegeDTO.setName(privilege.getName());
+
+        Assertions.assertThatThrownBy(() -> authorityService.update(privilegeDTO)).isInstanceOf(PrivilegeNotFoundExcepion.class);
+    }
+
+
+    @Test
+    @DisplayName("Test modification of a new privilege, throwing PrivilegeAlreadyExistException ")
+    @Transactional
+    @Rollback
+    void testModificationOfPrivilegerCase5() {
+        PrivilegeDTO privilegeDTO = new PrivilegeDTO();
+        privilegeDTO.setName("mimi");
+
+        PrivilegeDTO secondPrivilegeDTO = new PrivilegeDTO();
+        secondPrivilegeDTO.setName("ivan");
+
+        PrivilegeDTO firstPersistedEntity = authorityService.save(privilegeDTO);
+        PrivilegeDTO secondPersistedEntity = authorityService.save(secondPrivilegeDTO);
+
+        secondPersistedEntity.setName("mimi");
+
+        Assertions.assertThatThrownBy(() -> authorityService.update(secondPersistedEntity)).isInstanceOf(PrivilegeAlreadyExistException.class);
+    }
+
+
 }

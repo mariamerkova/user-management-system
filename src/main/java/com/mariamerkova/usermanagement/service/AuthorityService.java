@@ -11,4 +11,6 @@ public interface AuthorityService {
 
     PrivilegeDTO save(final PrivilegeDTO privilegeDTO);
 
+    PrivilegeDTO update(final PrivilegeDTO privilegeDTO);
+
 }

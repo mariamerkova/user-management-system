@@ -1,6 +1,7 @@
 package com.mariamerkova.usermanagement.service;
 
 import com.mariamerkova.usermanagement.exception.PrivilegeAlreadyExistException;
+import com.mariamerkova.usermanagement.exception.PrivilegeNotFoundExcepion;
 import com.mariamerkova.usermanagement.exception.RequiredArgumentException;
 import com.mariamerkova.usermanagement.model.Privilege;
 import com.mariamerkova.usermanagement.model.PrivilegeDTO;
@@ -48,6 +49,32 @@ public class AuthorityServiceImpl implements AuthorityService {
         privilegeRepository.save(privilege);
 
         return transformPrivilegeToPrivilegeDTO(privilege);
+    }
+
+    @Override
+    public PrivilegeDTO update(final PrivilegeDTO privilegeDTO) {
+        if (StringUtils.isBlank(privilegeDTO.getName())) {
+            throw new RequiredArgumentException();
+        }
+
+        if (privilegeDTO.getId() == null) {
+            throw new RequiredArgumentException();
+        }
+
+        if (privilegeRepository.findById(privilegeDTO.getId()) == null) {
+            throw new PrivilegeNotFoundExcepion();
+        }
+
+        Privilege  persistedPrivilegeWithSameName= privilegeRepository.findPrivilegeByName(privilegeDTO.getName());
+
+        if (persistedPrivilegeWithSameName.getId() != null && persistedPrivilegeWithSameName.getId().compareTo(privilegeDTO.getId()) != 0) {
+            throw new PrivilegeAlreadyExistException();
+        }
+
+        persistedPrivilegeWithSameName.setName(privilegeDTO.getName());
+
+        privilegeRepository.update(persistedPrivilegeWithSameName);
+        return transformPrivilegeToPrivilegeDTO(persistedPrivilegeWithSameName);
     }
 
 

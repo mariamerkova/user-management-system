@@ -58,4 +58,29 @@ public class PrivilegeRepositoryImpl implements PrivilegeRepository {
     }
 
 
+
+    @Override
+    public void update(final Privilege privilege) {
+        entityManager.persist(privilege);
+    }
+
+    @Override
+    public Privilege findById(final Long id) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Privilege> criteriaQuery = criteriaBuilder.createQuery(Privilege.class);
+        Root<Privilege> privilegeRoot = criteriaQuery.from(Privilege.class);
+
+        criteriaQuery.where(criteriaBuilder.equal(privilegeRoot.get("id"), id));
+        TypedQuery<Privilege> query = entityManager.createQuery(criteriaQuery);
+
+        Privilege privilege = null;
+        try {
+            privilege = query.getSingleResult();
+        } catch (NoResultException e) {
+
+        }
+        return privilege;
+    }
+
+
 }

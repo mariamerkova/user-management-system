@@ -43,4 +43,10 @@ public class ExceptionAdvice {
         return ex.getMessage();
     }
 
+    @ResponseBody
+    @ExceptionHandler(PrivilegeNotFoundExcepion.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    String privilegeAlreadyExistHandler(PrivilegeNotFoundExcepion ex) {
+        return ex.getMessage();
+    }
 }

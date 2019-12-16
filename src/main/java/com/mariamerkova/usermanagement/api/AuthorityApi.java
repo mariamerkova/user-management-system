@@ -4,10 +4,7 @@ import com.mariamerkova.usermanagement.model.PrivilegeDTO;
 import com.mariamerkova.usermanagement.service.AuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,5 +23,10 @@ public class AuthorityApi {
     @PostMapping("/privilege")
     public ResponseEntity<PrivilegeDTO> savePrivilege(PrivilegeDTO privilegeDTO) {
         return ResponseEntity.ok(authorityService.save(privilegeDTO));
+    }
+
+    @PutMapping("/privilege")
+    public ResponseEntity<PrivilegeDTO> updatePrililege(PrivilegeDTO privilegeDTO) {
+        return ResponseEntity.ok(authorityService.update(privilegeDTO));
     }
 }

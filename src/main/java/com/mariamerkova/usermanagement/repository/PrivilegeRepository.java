@@ -12,4 +12,8 @@ public interface PrivilegeRepository {
 
     Privilege findPrivilegeByName(final String name);
 
+    void update(final Privilege privilege);
+
+    Privilege findById(final Long id);
+
 }
