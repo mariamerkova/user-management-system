@@ -1,6 +1,7 @@
 package com.mariamerkova.usermanagement.api;
 
 import com.mariamerkova.usermanagement.model.PrivilegeDTO;
+import com.mariamerkova.usermanagement.model.RoleDTO;
 import com.mariamerkova.usermanagement.service.AuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,4 +35,27 @@ public class AuthorityApi {
     public ResponseEntity<Boolean> deletePrivilege(@PathVariable Long id) {
         return ResponseEntity.ok(authorityService.delete(id));
     }
+
+    @GetMapping("/role")
+    public ResponseEntity<List<RoleDTO>> findAllRoles() {
+        return ResponseEntity.ok(authorityService.findAllRoles());
+    }
+
+    @PostMapping("/role")
+    public  ResponseEntity<RoleDTO> saveRole(RoleDTO roleDTO) {
+        return ResponseEntity.ok(authorityService.saveRole(roleDTO));
+    }
+
+    @PutMapping("/role")
+    public ResponseEntity<RoleDTO> updateRole(RoleDTO roleDTO) {
+        return ResponseEntity.ok(authorityService.updateRole(roleDTO));
+    }
+
+    @DeleteMapping("/role/{id}")
+    public ResponseEntity<Boolean> deleteRole(@PathVariable Long id) {
+        return ResponseEntity.ok(authorityService.deleteRole(id));
+    }
+
+
+
 }

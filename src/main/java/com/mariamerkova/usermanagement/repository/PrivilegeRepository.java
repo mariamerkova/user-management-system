@@ -18,4 +18,6 @@ public interface PrivilegeRepository {
 
     void deletePrivilege(final Privilege privilege);
 
+
+
 }

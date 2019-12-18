@@ -49,4 +49,19 @@ public class ExceptionAdvice {
     String privilegeAlreadyExistHandler(PrivilegeNotFoundExcepion ex) {
         return ex.getMessage();
     }
+
+    @ResponseBody
+    @ExceptionHandler(RoleAlreadyExistException.class)
+    @ResponseStatus(HttpStatus.FOUND)
+    String roleAlreadyExistHandler(RoleAlreadyExistException ex) {
+        return ex.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(RoleNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    String roleNotFoundHandler(RoleNotFoundException ex) {
+        return ex.getMessage();
+    }
+
 }

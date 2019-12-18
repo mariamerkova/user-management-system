@@ -1,11 +1,12 @@
 package com.mariamerkova.usermanagement.service;
 
-import com.mariamerkova.usermanagement.exception.PrivilegeAlreadyExistException;
-import com.mariamerkova.usermanagement.exception.PrivilegeNotFoundExcepion;
-import com.mariamerkova.usermanagement.exception.RequiredArgumentException;
+import com.mariamerkova.usermanagement.exception.*;
 import com.mariamerkova.usermanagement.model.Privilege;
 import com.mariamerkova.usermanagement.model.PrivilegeDTO;
+import com.mariamerkova.usermanagement.model.Role;
+import com.mariamerkova.usermanagement.model.RoleDTO;
 import com.mariamerkova.usermanagement.repository.PrivilegeRepository;
+import com.mariamerkova.usermanagement.repository.RoleRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,9 @@ public class AuthorityServiceImpl implements AuthorityService {
 
     @Autowired
     private PrivilegeRepository privilegeRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
 
     @Override
@@ -64,20 +68,22 @@ public class AuthorityServiceImpl implements AuthorityService {
             throw new RequiredArgumentException();
         }
 
-        if (privilegeRepository.findById(privilegeDTO.getId()) == null) {
+        Privilege persistedPrivilege = privilegeRepository.findById(privilegeDTO.getId());
+
+        if (persistedPrivilege == null) {
             throw new PrivilegeNotFoundExcepion();
         }
 
-        Privilege  persistedPrivilegeWithSameName= privilegeRepository.findPrivilegeByName(privilegeDTO.getName());
+        Privilege  persistedPrivilegeWithSameName = privilegeRepository.findPrivilegeByName(privilegeDTO.getName());
 
-        if (persistedPrivilegeWithSameName.getId() != null && persistedPrivilegeWithSameName.getId().compareTo(privilegeDTO.getId()) != 0) {
+        if (persistedPrivilegeWithSameName != null && persistedPrivilegeWithSameName.getId().compareTo(privilegeDTO.getId()) != 0) {
             throw new PrivilegeAlreadyExistException();
         }
 
-        persistedPrivilegeWithSameName.setName(privilegeDTO.getName());
+        persistedPrivilege.setName(privilegeDTO.getName());
 
-        privilegeRepository.update(persistedPrivilegeWithSameName);
-        return transformPrivilegeToPrivilegeDTO(persistedPrivilegeWithSameName);
+        privilegeRepository.update(persistedPrivilege);
+        return transformPrivilegeToPrivilegeDTO(persistedPrivilege);
     }
 
     @Override
@@ -86,9 +92,9 @@ public class AuthorityServiceImpl implements AuthorityService {
         Privilege privilege = privilegeRepository.findById(id);
         if (privilege == null) {
             throw new PrivilegeNotFoundExcepion();
-        } else {
-            privilegeRepository.deletePrivilege(privilege);
         }
+
+        privilegeRepository.deletePrivilege(privilege);
         return true;
     }
 
@@ -98,5 +104,91 @@ public class AuthorityServiceImpl implements AuthorityService {
         privilegeDTO.setName(privilege.getName());
         return privilegeDTO;
     }
+
+    @Override
+    public List<RoleDTO> findAllRoles() {
+        List<RoleDTO> roleDTOList = new LinkedList<>();
+        List<Role> roles = roleRepository.findAll();
+
+        for (Role role : roles) {
+            roleDTOList.add(transformRoleToRoleDTO(role));
+        }
+        return roleDTOList;
+    }
+
+    @Override
+    @Transactional
+    public RoleDTO saveRole(final RoleDTO roleDTO) {
+        Role role = new Role();
+        role.setId(roleDTO.getId());
+        role.setName(roleDTO.getName());
+
+        if (StringUtils.isBlank(role.getName())) {
+            throw new RequiredArgumentException();
+        }
+
+        if (roleRepository.findRoleByName(role.getName()) != null) {
+            throw new RoleAlreadyExistException();
+        }
+
+        roleRepository.save(role);
+
+        return transformRoleToRoleDTO(role);
+    }
+
+    @Transactional
+    @Override
+    public RoleDTO updateRole(final RoleDTO roleDTO) {
+        if (StringUtils.isBlank(roleDTO.getName())) {
+            throw new RequiredArgumentException();
+        }
+
+        if (roleDTO.getId() == null) {
+            throw new RequiredArgumentException();
+        }
+
+        Role persistedRole = roleRepository.findById(roleDTO.getId());
+
+        if (persistedRole == null) {
+            throw new RoleNotFoundException();
+        }
+
+        Role persistedRoleWithSameName = roleRepository.findRoleByName(roleDTO.getName());
+
+        if (persistedRoleWithSameName != null && persistedRoleWithSameName.getId().compareTo(roleDTO.getId()) !=0) {
+            throw new RoleAlreadyExistException();
+        }
+
+        persistedRole.setName(roleDTO.getName());
+
+        roleRepository.update(persistedRole);
+        return transformRoleToRoleDTO(persistedRole);
+    }
+
+    @Transactional
+    @Override
+    public boolean deleteRole(final Long id) {
+        Role role = roleRepository.findById(id);
+        if (role == null) {
+            throw new RoleNotFoundException();
+        }
+
+        roleRepository.delete(role);
+        return true;
+    }
+
+    private RoleDTO transformRoleToRoleDTO(final Role role) {
+        RoleDTO roleDTO = new RoleDTO();
+        roleDTO.setId(role.getId());
+        roleDTO.setName(role.getName());
+        return roleDTO;
+    }
+
+
+
+
+
+
+
 
 }

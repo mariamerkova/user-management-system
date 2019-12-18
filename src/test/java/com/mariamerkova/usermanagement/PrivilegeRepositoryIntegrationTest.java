@@ -42,7 +42,8 @@ public class PrivilegeRepositoryIntegrationTest {
         privilege.setName("mimi");
 
         privilegeRepository.save(privilege);
-        Assertions.assertThat(privilege).isNotNull();
+        Privilege persistedPrivilege = privilegeRepository.findById(privilege.getId());
+        Assertions.assertThat(persistedPrivilege).isNotNull();
     }
 
     @Test
@@ -150,7 +151,6 @@ public class PrivilegeRepositoryIntegrationTest {
         privilegeRepository.deletePrivilege(privilege);
         persistedPrivilege = privilegeRepository.findById(privilege.getId());
         Assertions.assertThat(persistedPrivilege).isNull();
-
     }
 
     @Test
