@@ -4,6 +4,8 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Table(name = "USER")
@@ -37,6 +39,14 @@ public class User {
 
     @Column(name = "UPDATED_ON", nullable = false)
     private LocalDateTime updatedOn;
+
+    @ManyToMany(cascade = { CascadeType.ALL})
+    @JoinTable(
+            name = "ROLE_USER",
+            joinColumns = { @JoinColumn(name = "roleid_role") },
+            inverseJoinColumns = { @JoinColumn(name = "userid_user") }
+    )
+    List<Role> roles = new LinkedList<>();
 
     public User() {
     }
@@ -122,6 +132,14 @@ public class User {
 
     public void setUpdatedOn(LocalDateTime updatedOn) {
         this.updatedOn = updatedOn;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 }
 

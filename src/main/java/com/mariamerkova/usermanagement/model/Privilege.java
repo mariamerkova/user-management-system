@@ -1,6 +1,8 @@
 package com.mariamerkova.usermanagement.model;
 
 import javax.persistence.*;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Table(name = "PRIVILEGE")
@@ -13,6 +15,14 @@ public class Privilege {
 
     @Column(name = "NAME",  nullable = false)
     private String name;
+
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "PRIVILEGE_ROLE",
+            joinColumns = { @JoinColumn(name = "privilegeid_privilege")},
+            inverseJoinColumns = { @JoinColumn(name = "roleid_role")}
+    )
+    List<Role> roles = new LinkedList<>();
 
     public Long getId() {
         return id;
@@ -28,6 +38,14 @@ public class Privilege {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
     }
 }
 
