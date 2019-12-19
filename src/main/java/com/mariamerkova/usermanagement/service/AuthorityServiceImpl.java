@@ -39,7 +39,7 @@ public class AuthorityServiceImpl implements AuthorityService {
 
     @Override
     @Transactional
-    public PrivilegeDTO save(final PrivilegeDTO privilegeDTO) {
+    public PrivilegeDTO savePrivilege(final PrivilegeDTO privilegeDTO) {
         Privilege privilege = new Privilege();
         privilege.setName(privilegeDTO.getName());
         privilege.setId(privilegeDTO.getId());
@@ -133,6 +133,18 @@ public class AuthorityServiceImpl implements AuthorityService {
 
         roleRepository.save(role);
 
+        if (!roleDTO.getPrivilegeDTOS().isEmpty()) {
+            for (PrivilegeDTO privilegeDTO : roleDTO.getPrivilegeDTOS()) {
+                Privilege privilege = privilegeRepository.findById(privilegeDTO.getId());
+                if (privilege != null) {
+                    role.getPrivileges().add(privilege);
+                    privilege.getRoles().add(role);
+                    roleRepository.update(role);
+                    privilegeRepository.update(privilege);
+                }
+            }
+        }
+
         return transformRoleToRoleDTO(role);
     }
 
@@ -161,6 +173,33 @@ public class AuthorityServiceImpl implements AuthorityService {
 
         persistedRole.setName(roleDTO.getName());
 
+        Role role = roleRepository.findById(roleDTO.getId());
+        List<Privilege> newPrivileges = new LinkedList<>();
+        List<Privilege> currentPrivileges = role.getPrivileges();
+
+        for (Privilege currentPrivilege : currentPrivileges) {
+            if (roleDTO.getPrivilegeDTOS().stream().anyMatch(privilegeDTO -> currentPrivilege.getId().compareTo(privilegeDTO.getId()) == 0)) {
+                newPrivileges.add(currentPrivilege);
+            }
+        }
+
+        for (PrivilegeDTO privilegeDTO : roleDTO.getPrivilegeDTOS()) {
+            if (currentPrivileges.stream().noneMatch(currentPrivilege -> currentPrivilege.getId().compareTo(privilegeDTO.getId())== 0)) {
+                Privilege privilege = privilegeRepository.findById(privilegeDTO.getId());
+                privilege.getRoles().add(role);
+                privilegeRepository.update(privilege);
+                newPrivileges.add(privilege);
+            }
+        }
+
+        for (Privilege currentPrivilege : currentPrivileges) {
+            if (newPrivileges.stream().noneMatch(newPrivilege -> currentPrivilege.getId().compareTo(newPrivilege.getId()) == 0)) {
+                currentPrivilege.getRoles().remove(role);
+                privilegeRepository.update(currentPrivilege);
+            }
+        }
+
+        role.setPrivileges(newPrivileges);
         roleRepository.update(persistedRole);
         return transformRoleToRoleDTO(persistedRole);
     }
@@ -181,6 +220,16 @@ public class AuthorityServiceImpl implements AuthorityService {
         RoleDTO roleDTO = new RoleDTO();
         roleDTO.setId(role.getId());
         roleDTO.setName(role.getName());
+
+        List<PrivilegeDTO> privilegeDTOS = new LinkedList<>();
+        for(Privilege privilege : role.getPrivileges()) {
+            PrivilegeDTO privilegeDTO = new PrivilegeDTO();
+            privilegeDTO.setName(privilege.getName());
+            privilegeDTO.setId(privilege.getId());
+            privilegeDTOS.add(privilegeDTO);
+        }
+
+        roleDTO.setPrivilegeDTOS(privilegeDTOS);
         return roleDTO;
     }
 

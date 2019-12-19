@@ -10,7 +10,7 @@ public interface AuthorityService {
 
     List<PrivilegeDTO> findAll();
 
-    PrivilegeDTO save(final PrivilegeDTO privilegeDTO);
+    PrivilegeDTO savePrivilege(final PrivilegeDTO privilegeDTO);
 
     PrivilegeDTO update(final PrivilegeDTO privilegeDTO);
 

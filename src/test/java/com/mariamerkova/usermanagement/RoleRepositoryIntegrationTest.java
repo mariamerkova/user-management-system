@@ -3,6 +3,7 @@ package com.mariamerkova.usermanagement;
 import com.mariamerkova.usermanagement.exception.RequiredArgumentException;
 import com.mariamerkova.usermanagement.exception.RoleAlreadyExistException;
 import com.mariamerkova.usermanagement.exception.RoleNotFoundException;
+import com.mariamerkova.usermanagement.model.PrivilegeDTO;
 import com.mariamerkova.usermanagement.model.Role;
 import com.mariamerkova.usermanagement.model.RoleDTO;
 import com.mariamerkova.usermanagement.repository.RoleRepository;
@@ -161,5 +162,77 @@ public class RoleRepositoryIntegrationTest {
     void testDeletionOfRoleCase2() {
         Role role = new Role();
         Assertions.assertThatThrownBy(() -> authorityService.deleteRole(role.getId())).isInstanceOf(RoleNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("Test role creation with privileges ")
+    @Transactional
+    @Rollback
+    void testCreationOfRoleWithPrivilege() {
+        PrivilegeDTO firstPrivilegeDTO = new PrivilegeDTO();
+        firstPrivilegeDTO.setName("mimi");
+
+        PrivilegeDTO secondPrivilegeDTO = new PrivilegeDTO();
+        secondPrivilegeDTO.setName("misho");
+
+        firstPrivilegeDTO = authorityService.savePrivilege(firstPrivilegeDTO);
+        secondPrivilegeDTO = authorityService.savePrivilege(secondPrivilegeDTO);
+
+        RoleDTO roleDTO = new RoleDTO();
+        roleDTO.setName("boss");
+        roleDTO.getPrivilegeDTOS().add(firstPrivilegeDTO);
+        roleDTO.getPrivilegeDTOS().add(secondPrivilegeDTO);
+
+        roleDTO = authorityService.saveRole(roleDTO);
+        Role role = roleRepository.findById(roleDTO.getId());
+
+        Assertions.assertThat(role.getPrivileges().size()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("Test role updation with privileges ")
+    @Transactional
+    @Rollback
+    void testUpdationOfRoleWithPrivilege() {
+        PrivilegeDTO firstPrivilegeDTO = new PrivilegeDTO();
+        firstPrivilegeDTO.setName("mimi");
+
+        PrivilegeDTO secondPrivilegeDTO = new PrivilegeDTO();
+        secondPrivilegeDTO.setName("misho");
+
+        PrivilegeDTO thirdPrivilegeDTO = new PrivilegeDTO();
+        thirdPrivilegeDTO.setName("mishi");
+
+        PrivilegeDTO fourthPrivilegeDTO = new PrivilegeDTO();
+        fourthPrivilegeDTO.setName("vasko");
+
+        PrivilegeDTO finalFirstPrivilegeDTO = authorityService.savePrivilege(firstPrivilegeDTO);
+        PrivilegeDTO finalSecondPrivilegeDTO = authorityService.savePrivilege(secondPrivilegeDTO);
+        thirdPrivilegeDTO = authorityService.savePrivilege(thirdPrivilegeDTO);
+         PrivilegeDTO finalFourthPrivilegeDTO = authorityService.savePrivilege(fourthPrivilegeDTO);
+
+        RoleDTO roleDTO = new RoleDTO();
+        roleDTO.setName("boss");
+        roleDTO.getPrivilegeDTOS().add(finalFirstPrivilegeDTO);
+        roleDTO.getPrivilegeDTOS().add(finalSecondPrivilegeDTO);
+        roleDTO = authorityService.saveRole(roleDTO);
+
+        Role role = roleRepository.findById(roleDTO.getId());
+        Assertions.assertThat(role.getPrivileges().size()).isEqualTo(2);
+        Assertions.assertThat(role.getPrivileges().stream().anyMatch(privilege -> privilege.getId().compareTo(finalFirstPrivilegeDTO.getId()) == 0)).isTrue();
+        Assertions.assertThat(role.getPrivileges().stream().anyMatch(privilege -> privilege.getId().compareTo(finalSecondPrivilegeDTO.getId()) == 0)).isTrue();
+
+        roleDTO.getPrivilegeDTOS().clear();
+        roleDTO.getPrivilegeDTOS().add(finalFirstPrivilegeDTO);
+        roleDTO.getPrivilegeDTOS().add(finalFourthPrivilegeDTO);
+
+        authorityService.updateRole(roleDTO);
+        role = roleRepository.findById(roleDTO.getId());
+        Assertions.assertThat(role.getPrivileges().size()).isEqualTo(2);
+        Assertions.assertThat(role.getPrivileges().stream().anyMatch(privilege -> privilege.getId().compareTo(finalFirstPrivilegeDTO.getId()) == 0)).isTrue();
+        Assertions.assertThat(role.getPrivileges().stream().noneMatch(privilege -> privilege.getId().compareTo(finalSecondPrivilegeDTO.getId()) == 0)).isTrue();
+        Assertions.assertThat(role.getPrivileges().stream().anyMatch(privilege -> privilege.getId().compareTo(finalFourthPrivilegeDTO.getId()) == 0)).isTrue();
+
+
     }
 }

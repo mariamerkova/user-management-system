@@ -57,7 +57,7 @@ public class PrivilegeRepositoryIntegrationTest {
         PrivilegeDTO privilegeDTO = new PrivilegeDTO();
         privilegeDTO.setName("mimi");
 
-        Assertions.assertThatThrownBy(() -> authorityService.save(privilegeDTO)).isInstanceOf(PrivilegeAlreadyExistException.class);
+        Assertions.assertThatThrownBy(() -> authorityService.savePrivilege(privilegeDTO)).isInstanceOf(PrivilegeAlreadyExistException.class);
     }
 
     @Test
@@ -129,8 +129,8 @@ public class PrivilegeRepositoryIntegrationTest {
         PrivilegeDTO secondPrivilegeDTO = new PrivilegeDTO();
         secondPrivilegeDTO.setName("ivan");
 
-        PrivilegeDTO firstPersistedEntity = authorityService.save(privilegeDTO);
-        PrivilegeDTO secondPersistedEntity = authorityService.save(secondPrivilegeDTO);
+        PrivilegeDTO firstPersistedEntity = authorityService.savePrivilege(privilegeDTO);
+        PrivilegeDTO secondPersistedEntity = authorityService.savePrivilege(secondPrivilegeDTO);
 
         secondPersistedEntity.setName("mimi");
 

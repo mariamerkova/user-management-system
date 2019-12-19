@@ -23,7 +23,7 @@ public class AuthorityApi {
 
     @PostMapping("/privilege")
     public ResponseEntity<PrivilegeDTO> savePrivilege(PrivilegeDTO privilegeDTO) {
-        return ResponseEntity.ok(authorityService.save(privilegeDTO));
+        return ResponseEntity.ok(authorityService.savePrivilege(privilegeDTO));
     }
 
     @PutMapping("/privilege")
